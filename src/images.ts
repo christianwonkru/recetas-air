@@ -1,5 +1,5 @@
-const MAX_SIZE = 900
-const QUALITY = 0.7
+const MAX_SIZE = 720
+const QUALITY = 0.65
 
 export function optimizeRecipeImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
