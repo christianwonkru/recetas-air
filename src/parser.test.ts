@@ -14,7 +14,7 @@ describe('parseRecipeText', () => {
 
   it('no usa Ingredientes como nombre y entiende encabezados de OCR con guiones', () => {
     const result = parseRecipeText(`- Ingredientes:\n- 1 taza de yogur\n- 2 tazas de harina de trigo\n- 1 cda de esencia de vainilla\n- 2 cdtas de polvo de hornear\n- Pizca de sal\n\n- Preparación:\n1. Precalienta el horno a 180 ºC.\n2. Mezcla yogur, azúcar, huevos y vainilla.\n3. Incorpora harina y polvo de hornear.\nTiempo total: 35-40 minutos`)
-    expect(result.name).toBe('Bizcocho de yogur')
+    expect(result.name).toBe('')
     expect(result.ingredients).toHaveLength(5)
     expect(result.ingredients[1]).toMatchObject({ amount: '2 tazas', name: 'harina de trigo' })
     expect(result.temperature).toBe('180 °C')
@@ -29,8 +29,4 @@ describe('parseRecipeText', () => {
     expect(result.ingredients.map(item => item.name)).toEqual(['aceite', 'sal', 'patatas', 'harina'])
   })
 
-  it('infiere nombres útiles cuando la receta fotografiada no tiene título', () => {
-    expect(parseRecipeText(`Ingredientes:\n- 2 pechugas de pollo\nPasos:\n1. Cocinar 15 minutos.`).name).toBe('Pechugas de pollo')
-    expect(parseRecipeText(`Ingredientes:\n- 1 limón\n- 2 tazas de harina\n- azúcar\nPasos:\n1. Mezclar.`).name).toBe('Bizcocho de limón')
-  })
 })

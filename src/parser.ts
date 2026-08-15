@@ -37,28 +37,6 @@ function guessCategory(text: string): Category {
   return matches.find(([, pattern]) => pattern.test(value))?.[0] ?? 'Otros'
 }
 
-export function inferRecipeName(text: string, category?: Category) {
-  const value = text.toLowerCase()
-  if (/pechugas?/.test(value)) return 'Pechugas de pollo'
-  if (/alitas?/.test(value)) return 'Alitas de pollo'
-  if (/hamburguesa/.test(value)) return /pollo/.test(value) ? 'Hamburguesa de pollo' : 'Hamburguesa de carne'
-  if (/salm[oó]n/.test(value)) return 'Salmón en air fryer'
-  if (/merluza/.test(value)) return 'Merluza en air fryer'
-  if (/patatas?/.test(value) && category === 'Patatas y verduras') return 'Patatas en air fryer'
-  if (/tortilla/.test(value)) return 'Tortilla en air fryer'
-  if (category === 'Postres' || /harina|az[uú]car|polvo de hornear/.test(value)) {
-    if (/lim[oó]n/.test(value)) return 'Bizcocho de limón'
-    if (/yogur/.test(value)) return 'Bizcocho de yogur'
-    if (/chocolate|cacao/.test(value)) return 'Bizcocho de chocolate'
-    if (/vainilla/.test(value)) return 'Bizcocho de vainilla'
-    return 'Bizcocho casero'
-  }
-  if (category === 'Pollo' || /pollo/.test(value)) return 'Receta de pollo'
-  if (category === 'Pescado') return 'Pescado en air fryer'
-  if (category === 'Huevos') return 'Receta con huevos'
-  return 'Nueva receta'
-}
-
 function valueAfterLabel(lines: string[], labels: string[]) {
   const pattern = new RegExp(`^(?:${labels.join('|')})\\s*:?\\s*(.+)$`, 'i')
   return lines.map(line => withoutBullet(line).match(pattern)?.[1]?.trim()).find(Boolean) ?? ''
@@ -90,7 +68,7 @@ export function parseRecipeText(source: string): RecipeDraft {
   const fallbackSteps = lines.filter(line => /^\d+[.)]\s+/.test(line)).map(clean)
   const categoryText = valueAfterLabel(lines, ['categoría', 'categoria'])
   const category = CATEGORIES.find(item => item.toLowerCase() === categoryText.toLowerCase()) ?? guessCategory(source)
-  const title = explicitTitle || possibleTitle || inferRecipeName(source, category)
+  const title = explicitTitle || possibleTitle
   const noteLines = section(/^notas?\s*:?$/i, [/^categor[ií]a\s*:?/i])
   return {
     name: title,
