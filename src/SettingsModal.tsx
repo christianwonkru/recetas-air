@@ -1,13 +1,20 @@
-import { Check, Languages, Type, X } from 'lucide-react'
+import { Check, Languages, Plus, Tags, Trash2, Type, X } from 'lucide-react'
+import { useState } from 'react'
 import { FONTS, LANGUAGES, useSettings } from './settings'
+import type { CategoryDefinition } from './types'
 
-export function SettingsModal({ onClose }: { onClose: () => void }) {
+export function SettingsModal({ categories, onCategoriesChange, onClose }: { categories: CategoryDefinition[]; onCategoriesChange: (value: CategoryDefinition[]) => void; onClose: () => void }) {
   const { language, font, setLanguage, setFont, t } = useSettings()
+  const [newCategory, setNewCategory] = useState('')
+  const [subcategories, setSubcategories] = useState<Record<string,string>>({})
+  const addCategory = () => { const name = newCategory.trim(); if (!name || categories.some(item => item.name.toLowerCase() === name.toLowerCase())) return; onCategoriesChange([...categories, { name, subcategories: [] }]); setNewCategory('') }
+  const addSubcategory = (category: string) => { const name = (subcategories[category] ?? '').trim(); if (!name) return; onCategoriesChange(categories.map(item => item.name === category && !item.subcategories.some(sub => sub.toLowerCase() === name.toLowerCase()) ? { ...item, subcategories: [...item.subcategories, name] } : item)); setSubcategories(value => ({ ...value, [category]: '' })) }
   return <div className="overlay" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><section className="modal settings-modal" role="dialog" aria-modal="true">
     <header className="modal-header"><div><span className="eyebrow">{t('appearance')}</span><h2>{t('settings')}</h2></div><button className="icon-button" onClick={onClose} aria-label={t('close')}><X /></button></header>
     <p className="intro">{t('settingsIntro')}</p>
     <section className="settings-section"><h3><Languages /> {t('language')}</h3><div className="language-grid">{LANGUAGES.map(item => <button className={language === item.code ? 'selected' : ''} onClick={() => setLanguage(item.code)} key={item.code}><span>{item.label}</span>{language === item.code && <Check />}</button>)}</div></section>
     <section className="settings-section"><h3><Type /> {t('typography')}</h3><div className="font-grid">{FONTS.map(item => <button className={font === item.id ? 'selected' : ''} style={{ fontFamily: item.value }} onClick={() => setFont(item.id)} key={item.id}><b>Aa</b><span>{item.label}</span>{font === item.id && <Check />}</button>)}</div></section>
+    <section className="settings-section category-settings"><h3><Tags /> Categorías y subcategorías</h3><p>Crea los nombres que quieras. Tus recetas no se eliminan si quitas una categoría de esta lista.</p><div className="category-add"><input value={newCategory} onChange={e => setNewCategory(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCategory()} placeholder="Nueva categoría, por ejemplo Bebidas" /><button className="primary compact" onClick={addCategory}><Plus /> Añadir</button></div>{categories.map(category => <article key={category.name}><header><b>{category.name}</b><button className="icon-button small" aria-label={`Quitar ${category.name}`} onClick={() => onCategoriesChange(categories.filter(item => item.name !== category.name))}><Trash2 /></button></header><div className="subcategory-chips">{category.subcategories.map(sub => <span key={sub}>{sub}<button aria-label={`Quitar ${sub}`} onClick={() => onCategoriesChange(categories.map(item => item.name === category.name ? { ...item, subcategories: item.subcategories.filter(value => value !== sub) } : item))}>×</button></span>)}</div><div className="category-add"><input value={subcategories[category.name] ?? ''} onChange={e => setSubcategories(value => ({ ...value, [category.name]: e.target.value }))} onKeyDown={e => e.key === 'Enter' && addSubcategory(category.name)} placeholder={`Subcategoría de ${category.name}`} /><button className="secondary compact" onClick={() => addSubcategory(category.name)}><Plus /> Añadir</button></div></article>)}</section>
     <footer className="modal-actions"><button className="primary" onClick={onClose}>{t('done')}</button></footer>
   </section></div>
 }

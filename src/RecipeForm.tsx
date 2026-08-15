@@ -1,14 +1,14 @@
 import { Camera, Globe2, Images, Plus, Trash2, X } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { CATEGORIES, type Recipe, type RecipeDraft } from './types'
+import type { CategoryDefinition, Recipe, RecipeDraft } from './types'
 import { optimizeRecipeImage } from './images'
 import { useSettings } from './settings'
 import { PhotoSearchModal } from './PhotoSearchModal'
 import { NutritionEditor } from './Nutrition'
 
-interface Props { draft: RecipeDraft; editing?: Recipe; onChange: (draft: RecipeDraft) => void; onSave: () => void; onClose: () => void }
+interface Props { draft: RecipeDraft; editing?: Recipe; categories: CategoryDefinition[]; onChange: (draft: RecipeDraft) => void; onSave: () => void; onClose: () => void }
 
-export function RecipeForm({ draft, editing, onChange, onSave, onClose }: Props) {
+export function RecipeForm({ draft, editing, categories, onChange, onSave, onClose }: Props) {
   const { t, categoryLabel } = useSettings()
   const cameraInput = useRef<HTMLInputElement>(null)
   const libraryInput = useRef<HTMLInputElement>(null)
@@ -27,7 +27,8 @@ export function RecipeForm({ draft, editing, onChange, onSave, onClose }: Props)
       <header className="modal-header"><div><span className="eyebrow">ZUNO</span><h2 id="form-title">{editing ? t('edit') : t('newRecipe')}</h2></div><button className="icon-button" onClick={onClose} aria-label={t('close')}><X /></button></header>
       <div className="form-grid">
         <label className="wide">{t('name')} <span className="hint">{t('nameHint')}</span><input autoFocus value={draft.name} onChange={e => update('name', e.target.value)} placeholder="Ej. Salmón con limón" /></label>
-        <label>{t('category')}<select value={draft.category} onChange={e => update('category', e.target.value as RecipeDraft['category'])}>{CATEGORIES.map(c => <option value={c} key={c}>{categoryLabel(c)}</option>)}</select></label>
+        <label>{t('category')}<select value={draft.category} onChange={e => onChange({ ...draft, category: e.target.value, subcategory: '' })}>{categories.map(c => <option value={c.name} key={c.name}>{categoryLabel(c.name)}</option>)}</select></label>
+        <label>Subcategoría<select value={draft.subcategory ?? ''} onChange={e => update('subcategory', e.target.value)}><option value="">Sin subcategoría</option>{categories.find(c => c.name === draft.category)?.subcategories.map(item => <option value={item} key={item}>{item}</option>)}</select></label>
         <label>{t('temperature')}<input value={draft.temperature} onChange={e => update('temperature', e.target.value)} placeholder="190 °C" /></label>
         <label>{t('totalTime')}<input value={draft.cookingTime} onChange={e => update('cookingTime', e.target.value)} placeholder="15 minutos" /></label>
       </div>

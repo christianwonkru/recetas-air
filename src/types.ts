@@ -1,5 +1,6 @@
 export const CATEGORIES = ['Pollo', 'Carne', 'Pescado', 'Patatas y verduras', 'Huevos', 'Postres', 'Otros'] as const
-export type Category = typeof CATEGORIES[number]
+export type Category = string
+export interface CategoryDefinition { name: string; subcategories: string[] }
 
 export interface Ingredient {
   id: string
@@ -29,6 +30,7 @@ export interface Recipe {
   nutrition?: Nutrition
   photo?: string
   category: Category
+  subcategory?: string
   favorite: boolean
   createdAt: string
   updatedAt: string

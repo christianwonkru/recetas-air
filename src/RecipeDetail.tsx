@@ -8,7 +8,7 @@ export function RecipeDetail({ recipe, onClose, onEdit, onDelete, onFavorite }: 
   const { t, categoryLabel } = useSettings()
   return <div className="overlay" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><article className="modal detail" role="dialog" aria-modal="true">
     <header className={`detail-hero ${recipe.photo ? 'with-photo' : ''}`} style={recipe.photo ? { backgroundImage: `linear-gradient(90deg, rgba(20,45,35,.88), rgba(20,45,35,.45)), url(${recipe.photo})` } : undefined}>
-      <div className="detail-top"><span className="category-pill">{categoryLabel(recipe.category)}</span><button className="icon-button light" onClick={onClose} aria-label={t('close')}><X /></button></div>
+      <div className="detail-top"><span className="category-pill">{categoryLabel(recipe.category)}{recipe.subcategory ? ` · ${recipe.subcategory}` : ''}</span><button className="icon-button light" onClick={onClose} aria-label={t('close')}><X /></button></div>
       <h2>{recipe.name}</h2><p>{t('oilFree')}</p>
       <div className="stats"><span><Flame /> <b>{recipe.temperature || '—'}</b><small>{t('temperature')}</small></span><span><Clock3 /> <b>{recipe.cookingTime || '—'}</b><small>{t('totalTime')}</small></span></div>
     </header>
