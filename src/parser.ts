@@ -4,6 +4,27 @@ const uid = () => crypto.randomUUID()
 const clean = (value: string) => value.replace(/^[-•*]\s*/, '').replace(/^\d+[.)]\s*/, '').trim()
 const withoutBullet = (value: string) => value.replace(/^[-•*]\s*/, '').trim()
 
+function normalizeAmount(value: string) {
+  const normalized = value.replace('½', '1/2').replace(/(\d)\s*\/\s*(\d)/g, '$1/$2').trim()
+  const feminineUnit = /^(?:tazas?|cda(?:s)?|cdta(?:s)?|cucharadas?|cucharaditas?|unidades?|piezas?|pizcas?)$/i
+  const singular = (unit: string) => unit
+    .replace(/^tazas$/i, 'taza').replace(/^cdas$/i, 'cda').replace(/^cdtas$/i, 'cdta')
+    .replace(/^cucharadas$/i, 'cucharada').replace(/^cucharaditas$/i, 'cucharadita')
+    .replace(/^unidades$/i, 'unidad').replace(/^piezas$/i, 'pieza').replace(/^pizcas$/i, 'pizca')
+  const half = normalized.match(/^1\/2(?:\s+(.+))?$/)
+  if (half) {
+    if (!half[1]) return 'la mitad'
+    return `${feminineUnit.test(half[1]) ? 'media' : 'medio'} ${singular(half[1])}`
+  }
+  const mixedHalf = normalized.match(/^(\d+)\s+1\/2\s+(.+)$/)
+  if (mixedHalf) {
+    const whole = Number(mixedHalf[1])
+    const unit = whole === 1 ? singular(mixedHalf[2]) : mixedHalf[2]
+    return `${whole} ${unit} y ${feminineUnit.test(mixedHalf[2]) ? 'media' : 'medio'}`
+  }
+  return normalized
+}
+
 function guessCategory(text: string): Category {
   const value = text.toLowerCase()
   if (/az[uú]car|harina|vainilla|bizcocho|tarta|galleta|postre|chocolate|levadura|polvo de hornear/.test(value)) return 'Postres'
@@ -41,9 +62,9 @@ export function parseRecipeText(source: string): RecipeDraft {
   const temperature = temperatureNumber ? `${temperatureNumber} °C` : ''
   const cookingTime = valueAfterLabel(lines, ['tiempo(?: total)?', 'cocción', 'coccion']) || source.match(/\d+\s*[–-]\s*\d+\s*(?:minutos?|horas?)|\d+\s*(?:minutos?|horas?)/i)?.[0] || ''
   const ingredients = ingredientLines.map(line => {
-    const item = clean(line)
-    const match = item.match(/^((?:\d+[\d/.,–-]*|una?|dos|tres|al gusto|una pizca)\s*(?:g|kg|ml|l|tazas?|cda(?:s)?|cdta(?:s)?|cucharad(?:a|as)|cucharadita(?:s)?|cucharadas?|unidad(?:es)?|pieza(?:s)?|pizca(?:s)?|sobre(?:s)?)?)\s+(.+)$/i)
-    return { id: uid(), amount: match?.[1] ?? '', name: match?.[2]?.replace(/^de\s+/i, '') ?? item }
+    const item = clean(line).replace('½', '1/2').replace(/(\d)\s*\/\s*(\d)/g, '$1/$2')
+    const match = item.match(/^((?:(?:\d+\s+)?\d+\/\d+|\d+[\d/.,–-]*|una?|dos|tres|al gusto|una pizca)\s*(?:g|kg|ml|l|tazas?|cda(?:s)?|cdta(?:s)?|cucharad(?:a|as)|cucharadita(?:s)?|cucharadas?|unidad(?:es)?|pieza(?:s)?|pizca(?:s)?|sobre(?:s)?)?)\s+(.+)$/i)
+    return { id: uid(), amount: match ? normalizeAmount(match[1]) : '', name: match?.[2]?.replace(/^de\s+/i, '') ?? item }
   })
   const fallbackSteps = lines.filter(line => /^\d+[.)]\s+/.test(line)).map(clean)
   const categoryText = valueAfterLabel(lines, ['categoría', 'categoria'])

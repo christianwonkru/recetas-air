@@ -22,4 +22,10 @@ describe('parseRecipeText', () => {
     expect(result.steps).toHaveLength(3)
     expect(result.category).toBe('Postres')
   })
+
+  it('convierte medias cantidades a lenguaje natural', () => {
+    const result = parseRecipeText(`Ingredientes:\n- 1/2 taza de aceite\n- ½ cucharadita de sal\n- 1 / 2 kg de patatas\n- 1 1/2 tazas de harina\nPasos:\n1. Mezclar todo.`)
+    expect(result.ingredients.map(item => item.amount)).toEqual(['media taza', 'media cucharadita', 'medio kg', '1 taza y media'])
+    expect(result.ingredients.map(item => item.name)).toEqual(['aceite', 'sal', 'patatas', 'harina'])
+  })
 })
