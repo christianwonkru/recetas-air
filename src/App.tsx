@@ -10,7 +10,7 @@ import { BackupModal } from './BackupModal'
 import { SettingsModal } from './SettingsModal'
 import { useSettings } from './settings'
 
-const emptyDraft = (): RecipeDraft => ({ name: '', ingredients: [{ id: crypto.randomUUID(), amount: '', name: '' }], temperature: '', cookingTime: '', steps: [''], notes: 'Sin aceite.', photo: '', category: 'Otros' })
+const emptyDraft = (): RecipeDraft => ({ name: '', ingredients: [{ id: crypto.randomUUID(), amount: '', name: '' }], temperature: '', cookingTime: '', steps: [''], notes: 'Sin aceite.', photo: '', category: 'Otros', nutrition: { servings: 1, calories: 0, carbohydrates: 0, protein: 0, fat: 0, fiber: 0, sugars: 0, salt: 0 } })
 
 export default function App() {
   const { t, categoryLabel } = useSettings()
@@ -37,7 +37,7 @@ export default function App() {
   }), [recipes, query, category, favoritesOnly])
 
   const openCreate = () => { setEditing(undefined); setDraft(emptyDraft()) }
-  const openEdit = (recipe: Recipe) => { setSelected(null); setEditing(recipe); setDraft({ name: recipe.name, ingredients: recipe.ingredients, temperature: recipe.temperature, cookingTime: recipe.cookingTime, steps: recipe.steps, notes: recipe.notes, photo: recipe.photo ?? '', category: recipe.category }) }
+  const openEdit = (recipe: Recipe) => { setSelected(null); setEditing(recipe); setDraft({ name: recipe.name, ingredients: recipe.ingredients, temperature: recipe.temperature, cookingTime: recipe.cookingTime, steps: recipe.steps, notes: recipe.notes, photo: recipe.photo ?? '', category: recipe.category, nutrition: recipe.nutrition ?? { servings: 1, calories: 0, carbohydrates: 0, protein: 0, fat: 0, fiber: 0, sugars: 0, salt: 0 } }) }
   const save = () => {
     if (!draft) return
     const now = new Date().toISOString()
@@ -71,7 +71,7 @@ export default function App() {
         <div className="card-body"><h3>{recipe.name}</h3><p>{recipe.ingredients.slice(0, 3).map(x => x.name).filter(Boolean).join(' · ') || t('noIngredients')}</p><div><span><Flame /> {recipe.temperature || '—'}</span><span><Clock3 /> {recipe.cookingTime || '—'}</span></div></div>
       </article>)}</section> : <section className="empty"><Search /><h3>{t('empty')}</h3><p>{t('emptyHint')}</p><button className="primary" onClick={openCreate}><Plus /> {t('newRecipe')}</button></section>}
     </main>
-    <footer className="page-footer"><span><ChefHat /> RECETAS AIR</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.12</button><small>{t('localData')}</small></footer>
+    <footer className="page-footer"><span><ChefHat /> RECETAS AIR</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.13</button><small>{t('localData')}</small></footer>
     {selected && <RecipeDetail recipe={selected} onClose={() => setSelected(null)} onEdit={() => openEdit(selected)} onDelete={() => remove(selected)} onFavorite={() => toggleFavorite(selected.id)} />}
     {draft && <RecipeForm draft={draft} editing={editing} onChange={setDraft} onSave={save} onClose={() => setDraft(null)} />}
     {importOpen && <ImportModal onClose={() => setImportOpen(false)} onImport={value => { setImportOpen(false); setEditing(undefined); setDraft(value) }} />}

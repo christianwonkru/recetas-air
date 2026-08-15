@@ -7,6 +7,17 @@ export interface Ingredient {
   name: string
 }
 
+export interface Nutrition {
+  servings: number
+  calories: number
+  carbohydrates: number
+  protein: number
+  fat: number
+  fiber: number
+  sugars: number
+  salt: number
+}
+
 export interface Recipe {
   id: string
   name: string
@@ -15,6 +26,7 @@ export interface Recipe {
   cookingTime: string
   steps: string[]
   notes: string
+  nutrition?: Nutrition
   photo?: string
   category: Category
   favorite: boolean

@@ -4,6 +4,7 @@ import { CATEGORIES, type Recipe, type RecipeDraft } from './types'
 import { optimizeRecipeImage } from './images'
 import { useSettings } from './settings'
 import { PhotoSearchModal } from './PhotoSearchModal'
+import { NutritionEditor } from './Nutrition'
 
 interface Props { draft: RecipeDraft; editing?: Recipe; onChange: (draft: RecipeDraft) => void; onSave: () => void; onClose: () => void }
 
@@ -45,6 +46,7 @@ export function RecipeForm({ draft, editing, onChange, onSave, onClose }: Props)
       </div>)}</div>
       <label>{t('steps')} <span className="hint">{t('onePerLine')}</span><textarea rows={6} value={draft.steps.join('\n')} onChange={e => update('steps', e.target.value.split('\n'))} /></label>
       <label>{t('notesField')}<textarea rows={3} value={draft.notes} onChange={e => update('notes', e.target.value)} /></label>
+      <NutritionEditor draft={draft} onChange={onChange} />
       <footer className="modal-actions"><button className="secondary" onClick={onClose}>{t('cancel')}</button><button className="primary" disabled={!draft.name.trim()} onClick={onSave}>{editing ? t('save') : t('create')}</button></footer>
       {photoSearchOpen && <PhotoSearchModal initialQuery={draft.name} onClose={() => setPhotoSearchOpen(false)} onSelect={photo => { update('photo', photo); setPhotoSearchOpen(false) }} />}
     </section>
