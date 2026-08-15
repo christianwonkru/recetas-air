@@ -1,6 +1,7 @@
 import { Activity } from 'lucide-react'
-import type { Nutrition, RecipeDraft } from './types'
+import type { Nutrition, Recipe, RecipeDraft } from './types'
 import { useSettings } from './settings'
+import { estimateNutrition } from './nutritionEstimate'
 
 const LABELS: Record<string, Record<string, string>> = {
   es:{ title:'Estadísticas',servings:'Raciones',calories:'Calorías',carbs:'Hidratos de carbono',protein:'Proteínas',fat:'Grasas',fiber:'Fibra',sugars:'Azúcares',salt:'Sal',total:'Total de la receta',portion:'Por ración',estimate:'Valores aproximados. Revisa el envase de cada ingrediente si necesitas mayor precisión.' },
@@ -18,9 +19,11 @@ export function NutritionEditor({ draft, onChange }: { draft: RecipeDraft; onCha
   return <section className="nutrition-editor"><div className="section-heading"><h3><Activity /> {l.title}</h3></div><p>{l.total}</p><div className="nutrition-inputs">{fields.map(([key,label,unit]) => <label key={key}>{label}<span><input type="number" min="0" step={key === 'servings' ? '1' : '0.1'} value={n[key] || ''} onChange={e => set(key,e.target.value)} />{unit}</span></label>)}</div><small>{l.estimate}</small></section>
 }
 
-export function NutritionStats({ nutrition }: { nutrition?: Nutrition }) {
+export function NutritionStats({ recipe }: { recipe: Recipe }) {
   const { language } = useSettings(); const l = LABELS[language] ?? LABELS.es
-  if (!nutrition || !Object.values(nutrition).some(Number)) return null
+  const hasManualData = !!recipe.nutrition && Object.entries(recipe.nutrition).some(([key,value]) => key !== 'servings' && Number(value) > 0)
+  const nutrition = hasManualData ? recipe.nutrition! : estimateNutrition(recipe.ingredients, recipe.category)
+  if (!nutrition) return <section className="nutrition-stats"><h3><Activity /> {l.title}</h3><small>{l.estimate}</small></section>
   const portions = Math.max(1,nutrition.servings || 1), per = (value:number) => Math.round(value / portions * 10) / 10
   const energy = nutrition.carbohydrates*4 + nutrition.protein*4 + nutrition.fat*9
   const pct = (value:number,factor:number) => energy ? Math.round(value*factor/energy*100) : 0
