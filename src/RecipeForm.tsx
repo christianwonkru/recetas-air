@@ -20,7 +20,7 @@ export function RecipeForm({ draft, editing, onChange, onSave, onClose }: Props)
     <section className="modal" role="dialog" aria-modal="true" aria-labelledby="form-title">
       <header className="modal-header"><div><span className="eyebrow">RECETARIO</span><h2 id="form-title">{editing ? 'Editar receta' : 'Nueva receta'}</h2></div><button className="icon-button" onClick={onClose} aria-label="Cerrar"><X /></button></header>
       <div className="form-grid">
-        <label className="wide">Nombre<input autoFocus value={draft.name} onChange={e => update('name', e.target.value)} placeholder="Ej. Salmón con limón" /></label>
+        <label className="wide">Nombre <span className="hint">(revísalo o escríbelo tú)</span><input autoFocus value={draft.name} onChange={e => update('name', e.target.value)} placeholder="Ej. Salmón con limón" /></label>
         <label>Categoría<select value={draft.category} onChange={e => update('category', e.target.value as RecipeDraft['category'])}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></label>
         <label>Temperatura<input value={draft.temperature} onChange={e => update('temperature', e.target.value)} placeholder="190 °C" /></label>
         <label>Tiempo total<input value={draft.cookingTime} onChange={e => update('cookingTime', e.target.value)} placeholder="15 minutos" /></label>

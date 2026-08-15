@@ -11,4 +11,15 @@ describe('parseRecipeText', () => {
     expect(result.steps).toHaveLength(2)
     expect(result.category).toBe('Pescado')
   })
+
+  it('no usa Ingredientes como nombre y entiende encabezados de OCR con guiones', () => {
+    const result = parseRecipeText(`- Ingredientes:\n- 1 taza de yogur\n- 2 tazas de harina de trigo\n- 1 cda de esencia de vainilla\n- 2 cdtas de polvo de hornear\n- Pizca de sal\n\n- Preparación:\n1. Precalienta el horno a 180 ºC.\n2. Mezcla yogur, azúcar, huevos y vainilla.\n3. Incorpora harina y polvo de hornear.\nTiempo total: 35-40 minutos`)
+    expect(result.name).toBe('')
+    expect(result.ingredients).toHaveLength(5)
+    expect(result.ingredients[1]).toMatchObject({ amount: '2 tazas', name: 'harina de trigo' })
+    expect(result.temperature).toBe('180 °C')
+    expect(result.cookingTime).toBe('35-40 minutos')
+    expect(result.steps).toHaveLength(3)
+    expect(result.category).toBe('Postres')
+  })
 })
