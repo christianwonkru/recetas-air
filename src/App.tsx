@@ -60,7 +60,7 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><a className="brand" href="#"><span><ChefHat /></span><div><b>RECETAS <em>AIR</em></b><small>Tu cocina, más ligera</small></div></a><nav><button className="nav-active"><BookOpen /> {t('recipes')}</button><button onClick={() => setFavoritesOnly(!favoritesOnly)} className={favoritesOnly ? 'nav-active' : ''}><Heart /> {t('favorites')}</button><button onClick={() => setBackupOpen(true)}><ShieldCheck /> {t('backup')}</button></nav><button className="settings-button" onClick={() => setSettingsOpen(true)} aria-label={t('settings')}><Settings /></button><button className="primary compact" onClick={openCreate}><Plus /> {t('newRecipe')}</button></header>
+    <header className="topbar"><a className="brand" href="#"><span><ChefHat /></span><div><b>ZUNO</b><small>Tu cocina. Tus recetas.</small></div></a><nav><button className="nav-active"><BookOpen /> {t('recipes')}</button><button onClick={() => setFavoritesOnly(!favoritesOnly)} className={favoritesOnly ? 'nav-active' : ''}><Heart /> {t('favorites')}</button><button onClick={() => setBackupOpen(true)}><ShieldCheck /> {t('backup')}</button></nav><button className="settings-button" onClick={() => setSettingsOpen(true)} aria-label={t('settings')}><Settings /></button><button className="primary compact" onClick={openCreate}><Plus /> {t('newRecipe')}</button></header>
     <main>
       <section className="welcome"><div><span className="eyebrow">{t('eyebrow')}</span><h1>{t('today')}</h1></div><div className="hero-mark"><Utensils /></div></section>
       <section className="controls"><div className="search"><Search /><input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} /></div><button className="import-button" onClick={() => setImportOpen(true)}><Sparkles /> {t('import')}</button></section>
@@ -71,7 +71,7 @@ export default function App() {
         <div className="card-body"><h3>{recipe.name}</h3><p>{recipe.ingredients.slice(0, 3).map(x => x.name).filter(Boolean).join(' · ') || t('noIngredients')}</p><div><span><Flame /> {recipe.temperature || '—'}</span><span><Clock3 /> {recipe.cookingTime || '—'}</span></div></div>
       </article>)}</section> : <section className="empty"><Search /><h3>{t('empty')}</h3><p>{t('emptyHint')}</p><button className="primary" onClick={openCreate}><Plus /> {t('newRecipe')}</button></section>}
     </main>
-    <footer className="page-footer"><span><ChefHat /> RECETAS AIR</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.14</button><small>{t('localData')}</small></footer>
+    <footer className="page-footer"><span><ChefHat /> ZUNO</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.15</button><small>{t('localData')}</small></footer>
     {selected && <RecipeDetail recipe={selected} onClose={() => setSelected(null)} onEdit={() => openEdit(selected)} onDelete={() => remove(selected)} onFavorite={() => toggleFavorite(selected.id)} />}
     {draft && <RecipeForm draft={draft} editing={editing} onChange={setDraft} onSave={save} onClose={() => setDraft(null)} />}
     {importOpen && <ImportModal onClose={() => setImportOpen(false)} onImport={value => { setImportOpen(false); setEditing(undefined); setDraft(value) }} />}

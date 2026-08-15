@@ -1,7 +1,7 @@
 {
-  "name": "RECETAS AIR",
-  "short_name": "Recetas Air",
-  "description": "Tu recetario personal para air fryer, siempre sin aceite.",
+  "name": "ZUNO",
+  "short_name": "ZUNO",
+  "description": "Tu cocina. Tus recetas.",
   "lang": "es",
   "start_url": "./",
   "scope": "./",

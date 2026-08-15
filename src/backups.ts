@@ -34,17 +34,17 @@ export function createBackup(recipes: Recipe[]): RecipeBackup[] {
 }
 
 export function exportRecipes(recipes: Recipe[]) {
-  const payload = JSON.stringify({ app: 'RECETAS AIR', version: 1, exportedAt: new Date().toISOString(), recipes }, null, 2)
+  const payload = JSON.stringify({ app: 'ZUNO', version: 1, exportedAt: new Date().toISOString(), recipes }, null, 2)
   const url = URL.createObjectURL(new Blob([payload], { type: 'application/json' }))
   const link = document.createElement('a')
   link.href = url
-  link.download = `recetas-air-${new Date().toISOString().slice(0, 10)}.json`
+  link.download = `zuno-${new Date().toISOString().slice(0, 10)}.json`
   link.click()
   URL.revokeObjectURL(url)
 }
 
 export function parseBackupFile(source: string): Recipe[] {
   const parsed = JSON.parse(source)
-  if (!parsed || parsed.app !== 'RECETAS AIR' || !Array.isArray(parsed.recipes)) throw new Error('Archivo no válido')
+  if (!parsed || !['RECETAS AIR', 'ZUNO'].includes(parsed.app) || !Array.isArray(parsed.recipes)) throw new Error('Archivo no válido')
   return parsed.recipes
 }

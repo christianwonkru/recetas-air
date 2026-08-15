@@ -1,6 +1,6 @@
-# RECETAS AIR
+# ZUNO
 
-Recetario personal y responsive para air fryer. Funciona completamente en el navegador, sin cuentas, servidores ni servicios de pago. Las recetas se guardan en el almacenamiento local del dispositivo.
+Tu cocina. Tus recetas. Recetario personal y responsive para air fryer. Funciona completamente en el navegador, sin cuentas, servidores ni servicios de pago. Las recetas se guardan en el almacenamiento local del dispositivo.
 
 También es una PWA instalable en iPhone y funciona sin conexión después de abrirla al menos una vez con internet.
 

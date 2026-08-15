@@ -18,7 +18,7 @@ export function BackupModal({ recipes, backups, onClose, onRestore }: Props) {
       const restored = parseBackupFile(await file.text())
       if (confirm(`¿Sustituir las recetas actuales por las ${restored.length} del archivo?`)) onRestore(restored)
     } catch {
-      alert('No se ha podido leer el archivo. Selecciona una copia exportada por RECETAS AIR.')
+      alert('No se ha podido leer el archivo. Selecciona una copia exportada por ZUNO.')
     }
   }
   return <div className="overlay" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><section className="modal backup-modal" role="dialog" aria-modal="true">

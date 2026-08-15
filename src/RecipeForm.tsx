@@ -24,7 +24,7 @@ export function RecipeForm({ draft, editing, onChange, onSave, onClose }: Props)
   }
   return <div className="overlay" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}>
     <section className="modal" role="dialog" aria-modal="true" aria-labelledby="form-title">
-      <header className="modal-header"><div><span className="eyebrow">RECETAS AIR</span><h2 id="form-title">{editing ? t('edit') : t('newRecipe')}</h2></div><button className="icon-button" onClick={onClose} aria-label={t('close')}><X /></button></header>
+      <header className="modal-header"><div><span className="eyebrow">ZUNO</span><h2 id="form-title">{editing ? t('edit') : t('newRecipe')}</h2></div><button className="icon-button" onClick={onClose} aria-label={t('close')}><X /></button></header>
       <div className="form-grid">
         <label className="wide">{t('name')} <span className="hint">{t('nameHint')}</span><input autoFocus value={draft.name} onChange={e => update('name', e.target.value)} placeholder="Ej. Salmón con limón" /></label>
         <label>{t('category')}<select value={draft.category} onChange={e => update('category', e.target.value as RecipeDraft['category'])}>{CATEGORIES.map(c => <option value={c} key={c}>{categoryLabel(c)}</option>)}</select></label>
