@@ -4,6 +4,7 @@ import { optimizeRecipeImage } from './images'
 import { useSettings } from './settings'
 
 interface OpenverseImage { id: string; title: string; thumb: string; source: string }
+interface OpenverseResult { id:string; title?:string; thumbnail?:string; foreign_landing_url?:string; tags?:Array<{ name?:string }> }
 
 const UI: Record<string, Record<string, string>> = {
   es: { title:'Buscar fotos de platos', search:'Buscar', searching:'Buscando fotos…', options:'opciones de fotos', use:'Usar foto', source:'Ver fuente', none:'No se encontraron fotos. Prueba con otras palabras.', error:'No se pudo conectar con el buscador. Comprueba Internet e inténtalo de nuevo.', saveError:'No se pudo guardar esta imagen. Prueba con otra.', note:'Imágenes abiertas proporcionadas por Openverse. Consulta la fuente para ver su autor y licencia.' },
@@ -30,6 +31,29 @@ function searchTerms(query: string, language: string) {
   return translated || query.trim()
 }
 
+function normalize(value: string) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+}
+
+function relevantImages(results: OpenverseResult[], terms: string, fallbackTitle: string): OpenverseImage[] {
+  const phrase = normalize(terms)
+  const words = phrase.split(/\s+/).filter(word => word.length > 2)
+  return results.map(item => {
+    const title = normalize(item.title ?? '')
+    const tags = (item.tags ?? []).map(tag => normalize(tag.name ?? '')).filter(Boolean)
+    const exactTitle = title === phrase
+    const startsWithTitle = title.startsWith(`${phrase} `) || title.startsWith(`${phrase}-`)
+    const allWordsTagged = words.every(word => tags.includes(word))
+    const foodTagged = tags.some(tag => ['food','dessert','cake','cakes','bakery','recipe','baking','meal','dish'].includes(tag))
+    const misleading = tags.some(tag => ['miniature','miniaturefood','minifood','dollhouse','toy'].includes(tag)) || /crumb|last crumb|preparation board/.test(title)
+    const score = (allWordsTagged ? 100 : 0) + (exactTitle ? 60 : startsWithTitle ? 35 : 0) + (foodTagged ? 15 : 0) - (misleading ? 200 : 0)
+    return { item, score }
+  }).filter(({ item, score }) => !!item.thumbnail && score >= 50)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 40)
+    .map(({ item }) => ({ id:item.id, title:item.title || fallbackTitle, thumb:item.thumbnail!, source:item.foreign_landing_url ?? '' }))
+}
+
 export function PhotoSearchModal({ initialQuery, onClose, onSelect }: { initialQuery: string; onClose: () => void; onSelect: (photo: string) => void }) {
   const { t, language } = useSettings()
   const ui = UI[language] ?? UI.es
@@ -44,12 +68,13 @@ export function PhotoSearchModal({ initialQuery, onClose, onSelect }: { initialQ
     if (!query.trim()) return
     setLoading(true); setSearched(true); setError('')
     try {
-      const params = new URLSearchParams({ q: searchTerms(query, language), page_size:'20', mature:'false', categories:'photograph' })
-      const responses = await Promise.all([1, 2].map(page => fetch(`https://api.openverse.org/v1/images/?${params}&page=${page}`)))
+      const terms = searchTerms(query, language)
+      const params = new URLSearchParams({ q: terms, page_size:'20', mature:'false', categories:'photograph' })
+      const responses = await Promise.all([1, 2, 3].map(page => fetch(`https://api.openverse.org/v1/images/?${params}&page=${page}`)))
       if (responses.some(response => !response.ok)) throw new Error('Openverse request failed')
       const pages = await Promise.all(responses.map(response => response.json()))
-      const results = pages.flatMap(data => data.results ?? []) as Array<{ id:string; title?:string; thumbnail?:string; foreign_landing_url?:string }>
-      setImages(results.flatMap(item => item.thumbnail ? [{ id:item.id, title:item.title || query, thumb:item.thumbnail, source:item.foreign_landing_url ?? '' }] : []))
+      const results = pages.flatMap(data => data.results ?? []) as OpenverseResult[]
+      setImages(relevantImages(results, terms, query))
     } catch { setImages([]); setError(ui.error) }
     finally { setLoading(false) }
   }
