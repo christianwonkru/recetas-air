@@ -28,6 +28,7 @@ export default function App() {
   const [backupOpen, setBackupOpen] = useState(false)
   const [backups, setBackups] = useState<RecipeBackup[]>(loadBackups)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [focusCategorySettings, setFocusCategorySettings] = useState(false)
   useEffect(() => saveRecipes(recipes), [recipes])
   useEffect(() => saveCategories(categoryDefinitions), [categoryDefinitions])
   const availableCategories = useMemo(() => mergeRecipeCategories(categoryDefinitions, recipes.map(recipe => recipe.category)), [categoryDefinitions, recipes])
@@ -65,11 +66,11 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><a className="brand" href="#"><span><ChefHat /></span><div><b>ZUNO</b><small>Tu cocina. Tus recetas.</small></div></a><nav><button className="nav-active"><BookOpen /> {t('recipes')}</button><button onClick={() => setFavoritesOnly(!favoritesOnly)} className={favoritesOnly ? 'nav-active' : ''}><Heart /> {t('favorites')}</button><button onClick={() => setBackupOpen(true)}><ShieldCheck /> {t('backup')}</button></nav><button className="settings-button" onClick={() => setSettingsOpen(true)} aria-label={t('settings')}><Settings /></button><button className="primary compact" onClick={openCreate}><Plus /> {t('newRecipe')}</button></header>
+    <header className="topbar"><a className="brand" href="#"><span><ChefHat /></span><div><b>ZUNO</b><small>Tu cocina. Tus recetas.</small></div></a><nav><button className="nav-active"><BookOpen /> {t('recipes')}</button><button onClick={() => setFavoritesOnly(!favoritesOnly)} className={favoritesOnly ? 'nav-active' : ''}><Heart /> {t('favorites')}</button><button onClick={() => setBackupOpen(true)}><ShieldCheck /> {t('backup')}</button></nav><button className="settings-button" onClick={() => { setFocusCategorySettings(false); setSettingsOpen(true) }} aria-label={t('settings')}><Settings /></button><button className="primary compact" onClick={openCreate}><Plus /> {t('newRecipe')}</button></header>
     <main>
       <section className="welcome"><div><span className="eyebrow">{t('eyebrow')}</span><h1>{t('today')}</h1></div><div className="hero-mark"><Utensils /></div></section>
       <section className="controls"><div className="search"><Search /><input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} /></div><button className="import-button" onClick={() => setImportOpen(true)}><Sparkles /> {t('import')}</button></section>
-      <div className="category-list"><button className={category === 'Todas' ? 'active' : ''} onClick={() => { setCategory('Todas'); setSubcategory('Todas') }}>{t('all')} <span>{recipes.length}</span></button>{availableCategories.map(c => <button key={c.name} className={category === c.name ? 'active' : ''} onClick={() => { setCategory(c.name); setSubcategory('Todas') }}>{categoryLabel(c.name)}</button>)}</div>
+      <div className="category-list"><button className={category === 'Todas' ? 'active' : ''} onClick={() => { setCategory('Todas'); setSubcategory('Todas') }}>{t('all')} <span>{recipes.length}</span></button><button className="add-category-filter" onClick={() => { setFocusCategorySettings(true); setSettingsOpen(true) }}><Plus /> Añadir categoría</button>{availableCategories.map(c => <button key={c.name} className={category === c.name ? 'active' : ''} onClick={() => { setCategory(c.name); setSubcategory('Todas') }}>{categoryLabel(c.name)}</button>)}</div>
       {category !== 'Todas' && (availableCategories.find(item => item.name === category)?.subcategories.length ?? 0) > 0 && <div className="subcategory-list"><button className={subcategory === 'Todas' ? 'active' : ''} onClick={() => setSubcategory('Todas')}>{t('all')}</button>{availableCategories.find(item => item.name === category)?.subcategories.map(item => <button key={item} className={subcategory === item ? 'active' : ''} onClick={() => setSubcategory(item)}>{item}</button>)}</div>}
       <div className="result-heading"><h2>{favoritesOnly ? t('favoriteRecipes') : category === 'Todas' ? t('allRecipes') : categoryLabel(category)}</h2><span>{filtered.length} {filtered.length === 1 ? t('recipe') : t('recipesCount')}</span></div>
       {filtered.length ? <section className="recipe-grid">{filtered.map(recipe => <article className="recipe-card" key={recipe.id} onClick={() => setSelected(recipe)}>
@@ -77,11 +78,11 @@ export default function App() {
         <div className="card-body"><h3>{recipe.name}</h3><p>{recipe.ingredients.slice(0, 3).map(x => x.name).filter(Boolean).join(' · ') || t('noIngredients')}</p><div><span><Flame /> {recipe.temperature || '—'}</span><span><Clock3 /> {recipe.cookingTime || '—'}</span></div></div>
       </article>)}</section> : <section className="empty"><Search /><h3>{t('empty')}</h3><p>{t('emptyHint')}</p><button className="primary" onClick={openCreate}><Plus /> {t('newRecipe')}</button></section>}
     </main>
-    <footer className="page-footer"><span><ChefHat /> ZUNO</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.20</button><small>{t('localData')}</small></footer>
+    <footer className="page-footer"><span><ChefHat /> ZUNO</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.21</button><small>{t('localData')}</small></footer>
     {selected && <RecipeDetail recipe={selected} onClose={() => setSelected(null)} onEdit={() => openEdit(selected)} onDelete={() => remove(selected)} onFavorite={() => toggleFavorite(selected.id)} />}
     {draft && <RecipeForm draft={draft} editing={editing} categories={availableCategories} onChange={setDraft} onSave={save} onClose={() => setDraft(null)} />}
     {importOpen && <ImportModal onClose={() => setImportOpen(false)} onImport={value => { setImportOpen(false); setEditing(undefined); setDraft(value) }} />}
     {backupOpen && <BackupModal recipes={recipes} backups={backups} onClose={() => setBackupOpen(false)} onRestore={value => { const previous = createBackup(recipes); setBackups(previous); setRecipes(value); setBackupOpen(false) }} />}
-    {settingsOpen && <SettingsModal categories={categoryDefinitions} onCategoriesChange={setCategoryDefinitions} onClose={() => setSettingsOpen(false)} />}
+    {settingsOpen && <SettingsModal categories={categoryDefinitions} focusCategories={focusCategorySettings} onCategoriesChange={setCategoryDefinitions} onClose={() => setSettingsOpen(false)} />}
   </div>
 }

@@ -1,4 +1,4 @@
-const CACHE = 'recetas-air-v20'
+const CACHE = 'recetas-air-v21'
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.add('./')))
