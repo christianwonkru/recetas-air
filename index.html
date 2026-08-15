@@ -17,7 +17,16 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'))
+      if ('serviceWorker' in navigator) window.addEventListener('load', async () => {
+        const registration = await navigator.serviceWorker.register('./sw.js')
+        registration.update()
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!sessionStorage.getItem('recetas-air:reloaded')) {
+            sessionStorage.setItem('recetas-air:reloaded', '1')
+            window.location.reload()
+          }
+        })
+      })
     </script>
   </body>
 </html>

@@ -43,6 +43,17 @@ export default function App() {
   }
   const remove = (recipe: Recipe) => { if (confirm(`¿Eliminar “${recipe.name}”? Esta acción no se puede deshacer.`)) { setRecipes(items => items.filter(x => x.id !== recipe.id)); setSelected(null) } }
   const toggleFavorite = (id: string) => { setRecipes(items => items.map(x => x.id === id ? { ...x, favorite: !x.favorite } : x)); setSelected(current => current?.id === id ? { ...current, favorite: !current.favorite } : current) }
+  const forceUpdate = async () => {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations()
+      await Promise.all(registrations.map(registration => registration.unregister()))
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys()
+      await Promise.all(keys.filter(key => key.startsWith('recetas-air-')).map(key => caches.delete(key)))
+    }
+    window.location.reload()
+  }
 
   return <div className="app-shell">
     <header className="topbar"><a className="brand" href="#"><span><ChefHat /></span><div><b>RECETAS <em>AIR</em></b><small>Tu cocina, más ligera</small></div></a><nav><button className="nav-active"><BookOpen /> Mis recetas</button><button onClick={() => setFavoritesOnly(!favoritesOnly)} className={favoritesOnly ? 'nav-active' : ''}><Heart /> Favoritas</button><button onClick={() => setBackupOpen(true)}><ShieldCheck /> Copias</button></nav><button className="primary compact" onClick={openCreate}><Plus /> Nueva receta</button></header>
@@ -56,7 +67,7 @@ export default function App() {
         <div className="card-body"><h3>{recipe.name}</h3><p>{recipe.ingredients.slice(0, 3).map(x => x.name).filter(Boolean).join(' · ') || 'Sin ingredientes todavía'}</p><div><span><Flame /> {recipe.temperature || '—'}</span><span><Clock3 /> {recipe.cookingTime || '—'}</span></div></div>
       </article>)}</section> : <section className="empty"><Search /><h3>No hay recetas por aquí</h3><p>Prueba con otra búsqueda o crea una receta nueva.</p><button className="primary" onClick={openCreate}><Plus /> Nueva receta</button></section>}
     </main>
-    <footer className="page-footer"><span><ChefHat /> RECETAS AIR</span><p>Hecho para cocinar rico, fácil y sin aceite.</p><small>Los datos se guardan únicamente en este dispositivo.</small></footer>
+    <footer className="page-footer"><span><ChefHat /> RECETAS AIR</span><p>Hecho para cocinar rico, fácil y sin aceite.</p><button className="update-button" onClick={forceUpdate}>Actualizar app · v1.4</button><small>Los datos se guardan únicamente en este dispositivo.</small></footer>
     {selected && <RecipeDetail recipe={selected} onClose={() => setSelected(null)} onEdit={() => openEdit(selected)} onDelete={() => remove(selected)} onFavorite={() => toggleFavorite(selected.id)} />}
     {draft && <RecipeForm draft={draft} editing={editing} onChange={setDraft} onSave={save} onClose={() => setDraft(null)} />}
     {importOpen && <ImportModal onClose={() => setImportOpen(false)} onImport={value => { setImportOpen(false); setEditing(undefined); setDraft(value) }} />}

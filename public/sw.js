@@ -1,4 +1,4 @@
-const CACHE = 'recetas-air-v1'
+const CACHE = 'recetas-air-v4'
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.add('./')))
@@ -12,7 +12,7 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return
-  event.respondWith(fetch(event.request).then(response => {
+  event.respondWith(fetch(event.request, { cache: 'no-store' }).then(response => {
     if (response.ok && new URL(event.request.url).origin === self.location.origin) {
       const copy = response.clone()
       caches.open(CACHE).then(cache => cache.put(event.request, copy))
