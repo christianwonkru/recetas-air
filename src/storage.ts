@@ -4,6 +4,10 @@ import type { Recipe } from './types'
 const KEY = 'recetas-air:v1'
 const BACKUP_KEY = 'recetas-air:backups:v1'
 
+export function requestsCleanStart(search: string) {
+  return new URLSearchParams(search).get('inicio') === 'limpio'
+}
+
 const lemonCakeFallback: Partial<Recipe> = {
   ingredients: [
     { id: 'zuno-yogur', amount: '1 taza', name: 'yogurt natural' },
@@ -56,7 +60,7 @@ export function recoverRecipe(recipe: Recipe, history: Recipe[]): Recipe {
 export function loadRecipes(): Recipe[] {
   try {
     const stored = localStorage.getItem(KEY)
-    if (!stored) return initialRecipes
+    if (!stored) return requestsCleanStart(window.location.search) ? [] : initialRecipes
     const parsed = JSON.parse(stored)
     if (!Array.isArray(parsed)) return initialRecipes
     const backups = JSON.parse(localStorage.getItem(BACKUP_KEY) ?? '[]')
