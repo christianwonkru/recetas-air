@@ -8,7 +8,7 @@ import { ImportModal } from './ImportModal'
 import { BACKUP_INTERVAL_MS, createBackup, loadBackups, type RecipeBackup } from './backups'
 import { BackupModal } from './BackupModal'
 
-const emptyDraft = (): RecipeDraft => ({ name: '', ingredients: [{ id: crypto.randomUUID(), amount: '', name: '' }], temperature: '', cookingTime: '', steps: [''], notes: 'Sin aceite.', category: 'Otros' })
+const emptyDraft = (): RecipeDraft => ({ name: '', ingredients: [{ id: crypto.randomUUID(), amount: '', name: '' }], temperature: '', cookingTime: '', steps: [''], notes: 'Sin aceite.', photo: '', category: 'Otros' })
 
 export default function App() {
   const [recipes, setRecipes] = useState<Recipe[]>(loadRecipes)
@@ -33,7 +33,7 @@ export default function App() {
   }), [recipes, query, category, favoritesOnly])
 
   const openCreate = () => { setEditing(undefined); setDraft(emptyDraft()) }
-  const openEdit = (recipe: Recipe) => { setSelected(null); setEditing(recipe); setDraft({ name: recipe.name, ingredients: recipe.ingredients, temperature: recipe.temperature, cookingTime: recipe.cookingTime, steps: recipe.steps, notes: recipe.notes, category: recipe.category }) }
+  const openEdit = (recipe: Recipe) => { setSelected(null); setEditing(recipe); setDraft({ name: recipe.name, ingredients: recipe.ingredients, temperature: recipe.temperature, cookingTime: recipe.cookingTime, steps: recipe.steps, notes: recipe.notes, photo: recipe.photo ?? '', category: recipe.category }) }
   const save = () => {
     if (!draft) return
     const now = new Date().toISOString()
@@ -52,7 +52,7 @@ export default function App() {
       <div className="category-list"><button className={category === 'Todas' ? 'active' : ''} onClick={() => setCategory('Todas')}>Todas <span>{recipes.length}</span></button>{CATEGORIES.map(c => <button key={c} className={category === c ? 'active' : ''} onClick={() => setCategory(c)}>{c}</button>)}</div>
       <div className="result-heading"><h2>{favoritesOnly ? 'Recetas favoritas' : category === 'Todas' ? 'Todas las recetas' : category}</h2><span>{filtered.length} {filtered.length === 1 ? 'receta' : 'recetas'}</span></div>
       {filtered.length ? <section className="recipe-grid">{filtered.map(recipe => <article className="recipe-card" key={recipe.id} onClick={() => setSelected(recipe)}>
-        <div className={`card-art art-${CATEGORIES.indexOf(recipe.category) % 4}`}><ChefHat /><span>{recipe.category}</span><button className="heart-button" aria-label="Favorita" onClick={e => { e.stopPropagation(); toggleFavorite(recipe.id) }}><Heart className={recipe.favorite ? 'filled' : ''} /></button></div>
+        <div className={`card-art art-${CATEGORIES.indexOf(recipe.category) % 4}`}>{recipe.photo ? <img src={recipe.photo} alt="" /> : <ChefHat />}<span>{recipe.category}</span><button className="heart-button" aria-label="Favorita" onClick={e => { e.stopPropagation(); toggleFavorite(recipe.id) }}><Heart className={recipe.favorite ? 'filled' : ''} /></button></div>
         <div className="card-body"><h3>{recipe.name}</h3><p>{recipe.ingredients.slice(0, 3).map(x => x.name).filter(Boolean).join(' · ') || 'Sin ingredientes todavía'}</p><div><span><Flame /> {recipe.temperature || '—'}</span><span><Clock3 /> {recipe.cookingTime || '—'}</span></div></div>
       </article>)}</section> : <section className="empty"><Search /><h3>No hay recetas por aquí</h3><p>Prueba con otra búsqueda o crea una receta nueva.</p><button className="primary" onClick={openCreate}><Plus /> Nueva receta</button></section>}
     </main>

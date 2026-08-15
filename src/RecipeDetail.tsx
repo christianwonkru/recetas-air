@@ -4,7 +4,7 @@ import type { Recipe } from './types'
 interface Props { recipe: Recipe; onClose: () => void; onEdit: () => void; onDelete: () => void; onFavorite: () => void }
 export function RecipeDetail({ recipe, onClose, onEdit, onDelete, onFavorite }: Props) {
   return <div className="overlay" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><article className="modal detail" role="dialog" aria-modal="true">
-    <header className="detail-hero">
+    <header className={`detail-hero ${recipe.photo ? 'with-photo' : ''}`} style={recipe.photo ? { backgroundImage: `linear-gradient(90deg, rgba(20,45,35,.88), rgba(20,45,35,.45)), url(${recipe.photo})` } : undefined}>
       <div className="detail-top"><span className="category-pill">{recipe.category}</span><button className="icon-button light" onClick={onClose} aria-label="Cerrar"><X /></button></div>
       <h2>{recipe.name}</h2><p>Preparada sin aceite</p>
       <div className="stats"><span><Flame /> <b>{recipe.temperature || '—'}</b><small>Temperatura</small></span><span><Clock3 /> <b>{recipe.cookingTime || '—'}</b><small>Tiempo total</small></span></div>

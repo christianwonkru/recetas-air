@@ -50,6 +50,7 @@ export function parseRecipeText(source: string): RecipeDraft {
     cookingTime,
     steps: (stepLines.length ? stepLines : fallbackSteps).map(clean),
     notes: noteLines.map(clean).join(' '),
+    photo: '',
     category
   }
 }

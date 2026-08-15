@@ -15,6 +15,7 @@ export interface Recipe {
   cookingTime: string
   steps: string[]
   notes: string
+  photo?: string
   category: Category
   favorite: boolean
   createdAt: string

@@ -11,6 +11,7 @@ También es una PWA instalable en iPhone y funciona sin conexión después de ab
 - **Modelo y categorías** centralizados en `src/types.ts`.
 - **Parser local** basado en secciones y patrones en `src/parser.ts`; no envía el texto fuera del navegador.
 - **Copias automáticas** cada 20 minutos mientras la aplicación permanece abierta, con historial de 36 versiones, restauración y exportación/importación JSON.
+- **Fotografías por receta**, tomadas con la cámara o elegidas de la fototeca y comprimidas automáticamente antes de guardarse.
 - Componentes separados para listado, detalle, formulario e importación.
 
 ## Ejecutar
