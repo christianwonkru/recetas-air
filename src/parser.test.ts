@@ -29,4 +29,47 @@ describe('parseRecipeText', () => {
     expect(result.ingredients.map(item => item.name)).toEqual(['aceite', 'sal', 'patatas', 'harina'])
   })
 
+  it('organiza correctamente una captura del formulario de ZUNO', () => {
+    const result = parseRecipeText(`ZUNO
+Nueva receta
+Nombre
+Pechuga de pollo al perejil
+Categoría
+Pollo
+Temperatura
+190 °C
+Tiempo total
+14 minutos
+Foto de la receta
+Importar receta
+Ingredientes
+1 unidad
+pechuga de pollo
+al gusto
+sal
+1 cucharadita
+perejil
+Pasos
+(uno por línea)
+1. Precalienta la air fryer a 190 °C durante 3 minutos.
+2. Sazona la pechuga con sal por ambos lados.
+3. Añade el perejil por encima.
+4. Coloca la pechuga en la cesta de la air fryer.
+5. Cocina 7 minutos a 190 °C.
+6. Dale la vuelta y cocina otros 7 minutos.
+7. Comprueba que esté bien hecha y sirve.
+Notas
+Sin aceite.
+Si la pechuga es gruesa, añade 2-3 minutos más.
+aa
+Estadísticas
+Crear receta`)
+    expect(result).toMatchObject({ name: 'Pechuga de pollo al perejil', category: 'Pollo', temperature: '190 °C', cookingTime: '14 minutos' })
+    expect(result.ingredients.map(({ amount, name }) => ({ amount, name }))).toEqual([
+      { amount: '1 unidad', name: 'pechuga de pollo' }, { amount: 'al gusto', name: 'sal' }, { amount: '1 cucharadita', name: 'perejil' }
+    ])
+    expect(result.steps).toHaveLength(7)
+    expect(result.notes).toBe('Sin aceite.\nSi la pechuga es gruesa, añade 2-3 minutos más.')
+  })
+
 })

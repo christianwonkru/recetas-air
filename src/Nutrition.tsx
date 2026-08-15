@@ -1,5 +1,5 @@
 import { Activity } from 'lucide-react'
-import type { Nutrition, Recipe, RecipeDraft } from './types'
+import type { Recipe, RecipeDraft } from './types'
 import { useSettings } from './settings'
 import { estimateNutrition } from './nutritionEstimate'
 
@@ -11,12 +11,10 @@ const LABELS: Record<string, Record<string, string>> = {
   pt:{ title:'Estatísticas',servings:'Porções',calories:'Calorias',carbs:'Hidratos de carbono',protein:'Proteínas',fat:'Gorduras',fiber:'Fibra',sugars:'Açúcares',salt:'Sal',total:'Receita completa',portion:'Por porção',estimate:'Valores aproximados. Consulte as embalagens para maior precisão.' }
 }
 
-export function NutritionEditor({ draft, onChange }: { draft: RecipeDraft; onChange: (value: RecipeDraft) => void }) {
+export function NutritionEditor({ draft }: { draft: RecipeDraft; onChange: (value: RecipeDraft) => void }) {
   const { language } = useSettings(); const l = LABELS[language] ?? LABELS.es
-  const n = draft.nutrition ?? { servings:1, calories:0, carbohydrates:0, protein:0, fat:0, fiber:0, sugars:0, salt:0 }
-  const set = (key: keyof Nutrition, value: string) => onChange({ ...draft, nutrition:{ ...n, [key]: Math.max(0, Number(value) || 0) } })
-  const fields: Array<[keyof Nutrition,string,string]> = [['servings',l.servings,''],['calories',l.calories,'kcal'],['carbohydrates',l.carbs,'g'],['protein',l.protein,'g'],['fat',l.fat,'g'],['fiber',l.fiber,'g'],['sugars',l.sugars,'g'],['salt',l.salt,'g']]
-  return <section className="nutrition-editor"><div className="section-heading"><h3><Activity /> {l.title}</h3></div><p>{l.total}</p><div className="nutrition-inputs">{fields.map(([key,label,unit]) => <label key={key}>{label}<span><input type="number" min="0" step={key === 'servings' ? '1' : '0.1'} value={n[key] || ''} onChange={e => set(key,e.target.value)} />{unit}</span></label>)}</div><small>{l.estimate}</small></section>
+  const n = estimateNutrition(draft.ingredients, draft.category)
+  return <section className="nutrition-editor"><div className="section-heading"><h3><Activity /> {l.title}</h3></div><p>Cálculo automático según las cantidades de los ingredientes</p>{n ? <div className="nutrition-preview"><span><b>{n.calories}</b> kcal<small>{l.calories}</small></span><span><b>{n.carbohydrates}</b> g<small>{l.carbs}</small></span><span><b>{n.protein}</b> g<small>{l.protein}</small></span><span><b>{n.fat}</b> g<small>{l.fat}</small></span></div> : <p className="nutrition-empty">Añade cantidades e ingredientes reconocibles para ver la estimación.</p>}<small>{l.estimate}</small></section>
 }
 
 export function NutritionStats({ recipe }: { recipe: Recipe }) {

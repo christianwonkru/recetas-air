@@ -1,6 +1,6 @@
 import { Camera, FileText, ImagePlus, Sparkles, X } from 'lucide-react'
 import { useState } from 'react'
-import { parseRecipeText } from './parser'
+import { looksLikeAppScreenshot, parseRecipeText } from './parser'
 import type { RecipeDraft } from './types'
 import { optimizeRecipeImage } from './images'
 import { useSettings } from './settings'
@@ -42,6 +42,6 @@ export function ImportModal({ onClose, onImport }: { onClose: () => void; onImpo
       {(reading || status) && <div className="ocr-status"><div><span>{status}</span><b>{reading ? `${progress}%` : ''}</b></div>{reading && <progress max="100" value={progress} />}</div>}
     </div>}
     {(mode === 'text' || text) && <label>{mode === 'photo' ? t('recognizedText') : t('textRecipe')}<textarea autoFocus={mode === 'text'} rows={mode === 'text' ? 13 : 8} value={text} onChange={e => setText(e.target.value)} /></label>}
-    <footer className="modal-actions"><button className="secondary" onClick={onClose}>{t('cancel')}</button><button className="primary" disabled={!text.trim() || reading} onClick={() => onImport({ ...parseRecipeText(text), photo })}><Sparkles /> {t('organize')}</button></footer>
+    <footer className="modal-actions"><button className="secondary" onClick={onClose}>{t('cancel')}</button><button className="primary" disabled={!text.trim() || reading} onClick={() => onImport({ ...parseRecipeText(text), photo: looksLikeAppScreenshot(text) ? '' : photo })}><Sparkles /> {t('organize')}</button></footer>
   </section></div>
 }

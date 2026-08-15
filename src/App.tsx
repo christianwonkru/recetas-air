@@ -71,7 +71,7 @@ export default function App() {
         <div className="card-body"><h3>{recipe.name}</h3><p>{recipe.ingredients.slice(0, 3).map(x => x.name).filter(Boolean).join(' · ') || t('noIngredients')}</p><div><span><Flame /> {recipe.temperature || '—'}</span><span><Clock3 /> {recipe.cookingTime || '—'}</span></div></div>
       </article>)}</section> : <section className="empty"><Search /><h3>{t('empty')}</h3><p>{t('emptyHint')}</p><button className="primary" onClick={openCreate}><Plus /> {t('newRecipe')}</button></section>}
     </main>
-    <footer className="page-footer"><span><ChefHat /> ZUNO</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.18</button><small>{t('localData')}</small></footer>
+    <footer className="page-footer"><span><ChefHat /> ZUNO</span><button className="update-button" onClick={forceUpdate}>{t('update')} · v1.19</button><small>{t('localData')}</small></footer>
     {selected && <RecipeDetail recipe={selected} onClose={() => setSelected(null)} onEdit={() => openEdit(selected)} onDelete={() => remove(selected)} onFavorite={() => toggleFavorite(selected.id)} />}
     {draft && <RecipeForm draft={draft} editing={editing} onChange={setDraft} onSave={save} onClose={() => setDraft(null)} />}
     {importOpen && <ImportModal onClose={() => setImportOpen(false)} onImport={value => { setImportOpen(false); setEditing(undefined); setDraft(value) }} />}
